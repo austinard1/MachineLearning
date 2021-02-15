@@ -1,0 +1,206 @@
+{
+    "DTLearner": {
+        "best": {
+            "criterion": "gini",
+            "max_depth": 4,
+            "max_leaf_nodes": 10
+        },
+        "tuning": {
+            "criterion": [
+                "entropy",
+                "gini"
+            ],
+            "max_depth": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+            ],
+            "max_leaf_nodes": [
+                10
+            ]
+        }
+    },
+    "KNNLearner": {
+        "metric": {
+            "nested": false,
+            "vals": [
+                "chebyshev",
+                "euclidean",
+                "manhattan"
+            ]
+        },
+        "n_neighbors": {
+            "nested": false,
+            "vals": [
+                5,
+                10,
+                15,
+                20,
+                25,
+                30,
+                35,
+                40,
+                45,
+                50
+            ]
+        },
+        "weights": {
+            "nested": false,
+            "vals": [
+                "distance",
+                "uniform"
+            ]
+        }
+    },
+    "BoostingLearner": {
+        "algorithm": {
+            "nested": false,
+            "vals": [
+                "SAMME",
+                "SAMME.R"
+            ]
+        },
+        "base_estimator": {
+            "nested": true,
+            "module": "sklearn.tree",
+            "class": "DecisionTreeClassifier",
+            "arg": "max_depth",
+            "vals": [
+                1,
+                2,
+                3,
+                4,
+                5,
+                6,
+                7,
+                8,
+                9,
+                10
+            ]
+        },
+        "learning_rate": {
+            "nested": false,
+            "vals": [
+                0.1,
+                0.2,
+                0.3,
+                0.4,
+                0.5,
+                0.6,
+                0.7,
+                0.8,
+                0.9,
+                1.0
+            ]
+        },
+        "n_estimators": {
+            "nested": false,
+            "vals": [
+                1,
+                10,
+                20,
+                30,
+                40,
+                50,
+                60,
+                70,
+                80,
+                90,
+                100
+            ]
+        }
+    },
+    "NNLearner": {
+        "alpha": {
+            "nested": false,
+            "vals": [
+                1e-6,
+                1e-5,
+                1e-4,
+                1e-3,
+                1e-2,
+                1e-1,
+                1e0,
+                1e1,
+                1e2
+            ]
+        },
+        "batch_size": {
+            "nested": false,
+            "vals": [
+                "auto",
+                10,
+                100,
+                500
+            ]
+        },
+        "hidden_layer_sizes": {
+            "nested": false,
+            "vals": [
+                [
+                    100
+                ],
+                [
+                    30,
+                    30
+                ]
+            ]
+        },
+        "learning_rate": {
+            "nested": false,
+            "vals": [
+                "adaptive",
+                "constant",
+                "invscaling"
+            ]
+        },
+        "max_iter": {
+            "nested": false,
+            "vals": [
+                50,
+                100,
+                150,
+                200,
+                250,
+                300
+            ]
+        }
+    },
+    "SVMLearner": {
+        "C": {
+            "nested": false,
+            "vals": [
+                4,
+                5
+            ]
+        },
+        "kernel": {
+            "nested": false,
+            "vals": [
+                "linear",
+                "poly",
+                "precomputed",
+                "rbf",
+                "sigmoid"
+            ]
+        },
+        "tol": {
+            "nested": false,
+            "vals": [
+                1e-6,
+                1e-5,
+                1e-4,
+                1e-3,
+                1e-2,
+                1e-1
+            ]
+        }
+    }
+}

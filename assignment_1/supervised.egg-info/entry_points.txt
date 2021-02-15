@@ -1,0 +1,4 @@
+[console_scripts]
+contraceptive = supervised.contraceptive:main
+smart_grid = supervised.smart_grid:main
+
