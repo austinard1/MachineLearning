@@ -1,3 +1,11 @@
+Code Location
+https://github.com/austinard1/MachineLearning/tree/master/assignment_1
+
+0. Clone the above repository...
+git clone https://github.com/austinard1/MachineLearning.git
+cd MachineLearning/assignment_1/
+git checkout master
+
 1. Create conda environment
 
 conda env create -f environment.yml
