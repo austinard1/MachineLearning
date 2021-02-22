@@ -1,4 +1,4 @@
 [console_scripts]
-contraceptive = supervised.contraceptive:main
+bank_loan = supervised.bank_loan:main
 smart_grid = supervised.smart_grid:main
 

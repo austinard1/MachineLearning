@@ -89,7 +89,7 @@ def main():
     args = get_inputs()
     #data = pd.read_csv('contraceptive.csv')
     data = pd.read_csv('bank_loan.csv')
-    params_file = 'contraceptive_params.json'
+    params_file = 'bank_loan_params.json'
     X_train, X_test, y_train, y_test = preprocess_inputs(data)
     if args.learner == 'dt':
         decision_tree.decision_tree_learner(X_train, X_test, y_train, y_test, args.task, params_file)
