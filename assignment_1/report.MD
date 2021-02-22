@@ -138,7 +138,7 @@ The default learners had high bias according to the untuned learning curves. Hig
 |:-------------------------:|:-------------------------:|
 |![](supervised/plots/svm/svm_mca_3_linear_bank.png){width=55%}|![](supervised/plots/svm/svm_mca_4_linear_smartgrid.png){width=55%}|
 
-The C hyperparameter had similar effects on the linear kernel as with the RBF kernel. The tolerance hyperparameter increased bias significantly for values greater than 1 due to oversimplification of the feature classifications. However, varying tolerance at levels below 1 had little to no effect on bias or variance, shown by the model complexity curves below. The overall accuracy of the linear kernel learners was lower than their RBF counterparts.
+The C hyperparameter had similar effects on the linear kernel as with the RBF kernel. The tolerance hyperparameter increased bias significantly for values greater than 1 due to oversimplification of the feature classifications. However, varying tolerance at levels below 1 had little to no effect on bias or variance, shown by the model complexity curves above. The overall accuracy of the linear kernel learners was lower than their RBF counterparts.
 
 ## Tuned Algorithm Comparison
 | BANK LOAN DATA SET | Fit Time (s) | Accuracy | SMART GRID DATA SET | Fit Time (s) | Accuracy |
@@ -152,17 +152,18 @@ The C hyperparameter had similar effects on the linear kernel as with the RBF ke
 
 All algorithms performed better for the smart grid dataset in terms of accuracy. This dataset was the easier classification problem with more balanced features and binary classification. The bank dataset was a more difficult classification problem with 3 class outputs instead of 2 and with more outliers and less balanced feature samples. This resulted in the tuned learners for this dataset requiring hyperparameters that defined more complex models for all algorithms. The decision tree accuracy was the highest for the bank loan dataset, indicating that it was the most robust to outliers and imbalanced features. The SVM had the highest accuracy for the smart grid dataset without having the longest fit times, showing that it performed the best with balanced datasets and continuous features. The SVMs outperformed the neural networks for the larger dataset, but not for the smaller dataset, indicating that SVMs scale better than neural networks with larger dataset sizes. The boosting algorithm performed poorly on both datasets relative to the other learners, but it's important to note that the boosting algorithm intentionally used decision trees with aggressive pre-pruning techniques as the base estimator. By using better tuned base estimators, the performance of the boosting algorithm would increase accordingly. Based on these analyses, below are the recommendations for using each of these algorithms.
 
-**Decision Trees:** This would be the recommended algorithm when using lower quality datasets containing outliers and imbalanced features, as indicated by the highest overall accuracy with the bank loan dataset
+**Decision Trees:** This would be the recommended algorithm when using lower quality datasets containing outliers and imbalanced features, as indicated by the highest overall accuracy with the bank loan dataset.
 
 **K-Nearest Neighbors:** This would be the recommended algorithm when looking for fast fit times with balanced datasets that don't contain outliers.
 
-**Boosting:** This would not be the recommended algorithm if using poorly tuned base estimators
+**Boosting:** This would not be the recommended algorithm if using poorly tuned base estimators.
 
 **Neural Networks:** This would not be the recommended algorithm for any situation. SVMs perform comparably to the neural networks for both low quality and high quality datasets.
 
-**SVMs:** This would be the recommended algorithm when trying to acheive the highest possible accuracy with larger, high quality datasets, as indicated by the highest overall accuracy with the smart grid dataset.
+**SVMs:** This would be the recommended algorithm when trying to achieve the highest possible accuracy with larger, high quality datasets, as indicated by the highest overall accuracy with the smart grid dataset.
 
 # References
-* Piazza discussions
+* scikit-learn documentation/examples
+* Piazza discussions/Office Hour notes
 * Modules/Lectures
-* scikit-learn documentation
+* elitedatascience.com/machine-learning-algorithms
