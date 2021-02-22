@@ -13,7 +13,7 @@ from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.preprocessing import normalize
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
@@ -56,23 +56,28 @@ def get_inputs():
 
 def preprocess_inputs(survey, task='classification'):
     #Extracting the feature attributes from dataset
-    X = survey.drop(columns = ['Contraceptive Method Used'])
+    #X = survey.drop(columns = ['Contraceptive Method Used'])
+    #print(survey)
+    X = survey.drop(columns = ['Education'])
+    #print(X)
     #Extracting the target(label) attributes from dataset
-    y = survey['Contraceptive Method Used']
-
+    #y = survey['Contraceptive Method Used']
+    y = survey['Education']
+    #print(y)
     #columnTransformer = ColumnTransformer([('Standardizer', StandardScaler(), ['Age','Number of Children'])],
     #                                    remainder='passthrough')
     #X = columnTransformer.fit_transform(X)
-    # Standardize and
-    #scaler = StandardScaler()
-    #X_fit_scaler = scaler.fit(X)
-    #X = X_fit_scaler.transform(X)
 
-    #X_fit_norm = normalize(X, axis=0)
-    #StratifiedShuffleSplit.split(X_fit_norm, y, test_size=0.2)
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=27)
+    # Derived from https://stackoverflow.com/questions/29438265/stratified-train-test-split-in-scikit-learn
+    #splitter = StratifiedShuffleSplit(test_size=0.2, random_state=27)
+    #for train_index, test_index in splitter.split(X, y):
+    #    X_train, X_test = X[train_index], X[test_index]
+    #    y_train, y_test = y[train_index], y[test_index]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=27, stratify=y)
 
-    train_scaler = StandardScaler()
+
+    #train_scaler = StandardScaler()
+    train_scaler = RobustScaler()
     X_train_scaler = train_scaler.fit(X_train)
     X_train = X_train_scaler.transform(X_train)
 
@@ -82,12 +87,11 @@ def preprocess_inputs(survey, task='classification'):
 
 def main():
     args = get_inputs()
-    data = pd.read_csv('contraceptive.csv')
+    #data = pd.read_csv('contraceptive.csv')
+    data = pd.read_csv('bank_loan.csv')
     params_file = 'contraceptive_params.json'
     X_train, X_test, y_train, y_test = preprocess_inputs(data)
-    print('asdf')
     if args.learner == 'dt':
-        print('asdf')
         decision_tree.decision_tree_learner(X_train, X_test, y_train, y_test, args.task, params_file)
     elif args.learner == 'boosting':
         boosting.boosting_learner(X_train, X_test, y_train, y_test, args.task, params_file)

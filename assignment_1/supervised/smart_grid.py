@@ -13,7 +13,7 @@ from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
 from sklearn.model_selection import StratifiedShuffleSplit
 from sklearn.model_selection import GridSearchCV
-from sklearn.preprocessing import StandardScaler
+from sklearn.preprocessing import StandardScaler, RobustScaler
 from sklearn.preprocessing import normalize
 from sklearn.preprocessing import OneHotEncoder
 from sklearn.preprocessing import LabelEncoder
@@ -62,9 +62,16 @@ def preprocess_inputs(df, task='classification'):
         X = df.drop('stab', axis=1).copy()
 
 
-    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size=0.2, random_state=27)
+    # Derived from https://stackoverflow.com/questions/29438265/stratified-train-test-split-in-scikit-learn
+    #splitter = StratifiedShuffleSplit(test_size=0.2, random_state=27)
+    #for train_index, test_index in splitter.split(X, y):
+    #    X_train, X_test = X[train_index], X[test_index]
+    #    y_train, y_test = y[train_index], y[test_index]
+    X_train, X_test, y_train, y_test = train_test_split(X, y, test_size = 0.2, random_state=27, stratify=y)
 
-    train_scaler = StandardScaler()
+
+    #train_scaler = StandardScaler()
+    train_scaler = RobustScaler()
     X_train_scaler = train_scaler.fit(X_train)
     X_train = X_train_scaler.transform(X_train)
 
@@ -74,7 +81,7 @@ def preprocess_inputs(df, task='classification'):
 
 def main():
     args = get_inputs()
-    data = pd.read_csv('smart_grid.csv')
+    data = pd.read_csv('smart_grid_2.csv')
     params_file = 'smart_grid_params.json'
     X_train, X_test, y_train, y_test = preprocess_inputs(data)
     print('asdf')

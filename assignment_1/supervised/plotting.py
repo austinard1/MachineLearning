@@ -2,11 +2,12 @@ import matplotlib.pyplot as plt
 import numpy as np
 from sklearn.model_selection import learning_curve
 from sklearn.model_selection import validation_curve
+from sklearn.metrics import plot_confusion_matrix
 import itertools
 
 # Taken from https://scikit-learn.org/stable/auto_examples/model_selection/plot_learning_curve.html
 def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
-                        n_jobs=None, train_sizes=np.linspace(.1, 1.0, 5)):
+                        n_jobs=None, train_sizes=np.linspace(.1, 1.0, 10)):
     """
     Generate 3 plots: the test and training learning curve, the training
     samples vs fit times curve, the fit times vs score curve.
@@ -67,7 +68,7 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
         (default: np.linspace(0.1, 1.0, 5))
     """
     if axes is None:
-        _, axes = plt.subplots(1, 3, figsize=(20, 5))
+        _, axes = plt.subplots(1, 2, figsize=(10, 5))
 
     axes[0].set_title(title)
     if ylim is not None:
@@ -109,15 +110,6 @@ def plot_learning_curve(estimator, title, X, y, axes=None, ylim=None, cv=None,
     axes[1].set_ylabel("fit_times")
     axes[1].set_title("Scalability of the model")
 
-    # Plot fit_time vs score
-    axes[2].grid()
-    axes[2].plot(fit_times_mean, test_scores_mean, 'o-')
-    axes[2].fill_between(fit_times_mean, test_scores_mean - test_scores_std,
-                         test_scores_mean + test_scores_std, alpha=0.1)
-    axes[2].set_xlabel("fit_times")
-    axes[2].set_ylabel("Score")
-    axes[2].set_title("Performance of the model")
-    #plt.show()
     return plt
 
 # Derived from https://scikit-learn.org/stable/auto_examples/model_selection/plot_validation_curve.html#sphx-glr-auto-examples-model-selection-plot-validation-curve-py
@@ -147,9 +139,14 @@ def plot_validation_curve(
     plt.title(title)
     plt.xlabel(param_name)
     plt.ylabel("Score")
-    #plt.ylim(0, 1.1)
+    plt.ylim(0.4, 1.1)
     lw = 2
-    plt.semilogx(
+
+    # Turn params into strings for hidden_layer_sizes
+    if param_name == 'hidden_layer_sizes':
+        param_range = [str(param) for param in param_range]
+
+    plt.plot(
         param_range, train_scores_mean, label="Training score", color="darkorange", lw=lw
     )
     plt.fill_between(
@@ -160,7 +157,7 @@ def plot_validation_curve(
         color="darkorange",
         lw=lw,
     )
-    plt.semilogx(
+    plt.plot(
         param_range, test_scores_mean, label="Cross-validation score", color="navy", lw=lw
     )
     plt.fill_between(
@@ -176,18 +173,15 @@ def plot_validation_curve(
     return plt
 
 # Taken from https://scikit-learn.org/stable/auto_examples/model_selection/plot_confusion_matrix.html
-    def plot_confusion_matrix(classifier, X_test, y_test):
-        titles_options = [("Confusion matrix, without normalization", 'false'),
-                  ("Normalized confusion matrix", 'true')]
-        for title, normalize in titles_options:
-            disp = plot_confusion_matrix(classifier, X_test, y_test,
-                                 cmap=plt.cm.Blues)
-            disp.ax_.set_title(title)
+def plot_conf_mat(classifier, X_test, y_test, title):
+    disp = plot_confusion_matrix(classifier, X_test, y_test,
+                                cmap=plt.cm.Blues, normalize='true')
+    disp.ax_.set_title(title)
 
-            print(title)
-            print(disp.confusion_matrix)
+    print(title)
+    print(disp.confusion_matrix)
 
-        plt.show()
+    return plt
 
 # Taken from https://stackoverflow.com/questions/28200786/how-to-plot-scikit-learn-classification-report
 def plot_classification_report(classificationReport,
