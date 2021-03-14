@@ -1,3 +1,0 @@
-,Iteration,Fitness,Time,State,Population Size,Mutation Rate,max_iters
-0,0,2.0,0.0017583000000001014,"[1, 0, 0, 1, 0]",150,0.05,1000
-1,1000,6.0,0.3570761,"[0, 0, 0, 0, 0]",150,0.05,1000

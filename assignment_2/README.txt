@@ -32,6 +32,8 @@ cd optimization/
 
 optimization -t <task_option> -o <optimizer> -p <problem>
 
+NOTE: You must pass in all optimizers for all tasks, otherwise plots won't generate correctly
+
 Task options...
 
 tune_problem = Generate tuning plots for tuning optimization problem listed in <problem> arg
