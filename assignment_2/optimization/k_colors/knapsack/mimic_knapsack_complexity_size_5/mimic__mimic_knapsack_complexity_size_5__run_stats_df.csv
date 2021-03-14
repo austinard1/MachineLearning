@@ -1,0 +1,3 @@
+,Iteration,Fitness,Time,State,use_fast_mimic,Population Size,Keep Percent,max_iters
+0,0,5.0,0.004871299999999579,"[1, 0, 0, 1, 0]",False,200,0.45,100
+1,100,5.0,0.06816979999999973,"[1, 0, 0, 1, 0]",False,200,0.45,100

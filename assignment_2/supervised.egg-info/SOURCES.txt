@@ -1,0 +1,7 @@
+setup.py
+supervised.egg-info/PKG-INFO
+supervised.egg-info/SOURCES.txt
+supervised.egg-info/dependency_links.txt
+supervised.egg-info/entry_points.txt
+supervised.egg-info/requires.txt
+supervised.egg-info/top_level.txt

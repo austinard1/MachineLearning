@@ -1,0 +1,11 @@
+name: asdf
+dependencies:
+- python=3.8
+- scikit-learn
+- pandas
+- numpy
+- matplotlib
+- ipython
+- jupyter
+- jupyterlab
+- networkx
