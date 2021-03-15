@@ -6,7 +6,7 @@ from mlrose_hiive import runners
 from mlrose_hiive import algorithms
 
 
-def main(optimizer_list, task):
+def main(task):
     if 'tune_problem' in task:
         # FOUR PEAKS GOOD FOR GENETIC
 
@@ -66,350 +66,348 @@ def main(optimizer_list, task):
         # Four Peaks
         four_peaks_fitness = mlrose.FourPeaks(t_pct=0.25)
         problem = mlrose.DiscreteOpt(problem_size, four_peaks_fitness, maximize=True, max_val=2)
-        if 'rhc' in optimizer_list:
-            problem_size = 50
-            rhc_fitness_tuning_list = []
-            rhc_param_tuning_list = []
-            time_tuning_list = []
-            rhc_feval_tuning_list = []
-            asdf_list = []
-            fdsa_list = []
-            experiment_name = 'rhc_four_peaks_tuning_size_' + str(problem_size)
-            #restart_list = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
-            restart_list = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
-            rhc = runners.RHCRunner(problem=problem,
+        problem_size = 50
+        rhc_fitness_tuning_list = []
+        rhc_param_tuning_list = []
+        time_tuning_list = []
+        rhc_feval_tuning_list = []
+        asdf_list = []
+        fdsa_list = []
+        experiment_name = 'rhc_four_peaks_tuning_size_' + str(problem_size)
+        #restart_list = [5, 10, 15, 20, 25, 30, 35, 40, 45, 50, 55, 60, 65, 70, 75, 80, 85, 90, 95, 100]
+        restart_list = [10, 20, 30, 40, 50, 60, 70, 80, 90, 100]
+        rhc = runners.RHCRunner(problem=problem,
+                    experiment_name=experiment_name,
+                    output_directory='four_peaks',
+                    seed=27,
+                    iteration_list=[5000],
+                    max_attempts=50,
+                    restart_list=restart_list)
+        # the two data frames will contain the results
+        rhc_run_stats, rhc_run_curves = rhc.run()
+        for restart in restart_list:
+            this_temp_df = rhc_run_curves.loc[rhc_run_curves['Restarts'] == restart]
+            this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
+            rhc_fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
+            rhc_param_tuning_list.append(restart)
+            rhc_feval_tuning_list.append(3 * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
+            time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
+            asdf_list.append(this_temp_df['Fitness'])
+            fdsa_list.append(this_temp_df['Iteration'])
+        # plt.rc("font", size=8)
+        # plt.rc("axes", titlesize=12)
+        # plt.rc("axes", labelsize=10)
+        # plt.rc("xtick", labelsize=8)
+        # plt.rc("ytick", labelsize=8)
+        # plt.rc("legend", fontsize=8)
+        # plt.rc("figure", titlesize=11)
+        # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
+        # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
+        # fig.suptitle('RHC Restarts Tuning, problem_size = ' + str(problem_size))
+        # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
+        # ax[0].set(xlabel='Restarts', ylabel = 'Time')
+
+        # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
+        # ax[1].set(xlabel='Restarts', ylabel = 'Fitness')
+
+        # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
+        # ax[2].set(xlabel='Restarts', ylabel = 'Function Evaluations')
+        # ax[2].yaxis.tick_right()
+
+        # plt.show()
+
+        # fig, ax = plt.subplots()
+        # ax.scatter(fdsa_list[7], asdf_list[7])
+        # ax.set(xlabel='Iteration', ylabel = 'Fitness')
+        # plt.show()
+        # problem_size = 50
+
+
+        sa_fitness_tuning_list = []
+        sa_param_tuning_list = []
+        time_tuning_list = []
+        sa_feval_tuning_list = []
+        asdf_list = []
+        fdsa_list = []
+        experiment_name = 'sa_four_peaks_tuning_size_' + str(problem_size)
+        temperature_list = np.arange(1, 50, 0.5)
+        sa = runners.SARunner(problem=problem,
+                    experiment_name=experiment_name,
+                    output_directory='four_peaks',
+                    seed=27,
+                    iteration_list=[1000],
+                    max_attempts=100,
+                    temperature_list=temperature_list)
+                    #decay_list=mlrose.GeomDecay(init_temp=1.1))
+                    #temperature_list=[1, 10, 50, 100, 250, 500, 1000, 2500, 5000, 10000])
+                    #temperature_list=[1, 10, 50, 100, 250, 500, 1000, 2500, 5000, 10000])
+        # the two data frames will contain the results
+        df_run_stats, df_run_curves = sa.run()
+        df_run_curves['Temperature'] = pd.to_numeric(df_run_curves['Temperature'].astype(str).astype(float))
+        for temp in temperature_list:
+            this_temp_df = df_run_curves.loc[df_run_curves['Temperature'] == temp]
+            this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
+            sa_fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
+            sa_param_tuning_list.append(temp)
+            sa_feval_tuning_list.append(2 * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
+            time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
+            asdf_list.append(this_temp_df['Fitness'])
+            fdsa_list.append(this_temp_df['Iteration'])
+        # plt.rc("font", size=8)
+        # plt.rc("axes", titlesize=12)
+        # plt.rc("axes", labelsize=10)
+        # plt.rc("xtick", labelsize=8)
+        # plt.rc("ytick", labelsize=8)
+        # plt.rc("legend", fontsize=8)
+        # plt.rc("figure", titlesize=11)
+        # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
+        # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
+        # fig.suptitle('SA Temperature Tuning, problem_size = ' + str(problem_size))
+        # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
+        # ax[0].set(xlabel='Temperature', ylabel = 'Time')
+
+        # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
+        # ax[1].set(xlabel='Temperature', ylabel = 'Fitness')
+
+        # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
+        # ax[2].set(xlabel='Temperature', ylabel = 'Function Evaluations')
+        # ax[2].yaxis.tick_right()
+
+        # plt.show()
+
+        # fig, ax = plt.subplots()
+        # ax.scatter(fdsa_list[17], asdf_list[17])
+        # ax.set(xlabel='Iteration', ylabel = 'Fitness')
+        # plt.show()
+
+
+        # fitness_tuning_list = []
+        # param_tuning_list = []
+        # time_tuning_list = []
+        # feval_tuning_list = []
+        # asdf_list = []
+        # fdsa_list = []
+        # experiment_name = 'ga_four_peaks_tuning_size_' + str(problem_size)
+        # population_sizes_list=300,
+        # mutation_rates_list=np.arange(0.05, 1.0, 0.05)
+        # ga = runners.GARunner(problem=problem,
+        #             experiment_name=experiment_name,
+        #             output_directory='four_peaks',
+        #             seed=27,
+        #             iteration_list=[5000],
+        #             population_sizes=population_sizes_list,
+        #             mutation_rates=mutation_rates_list,
+        #             max_attempts=100)
+
+        # # the two data frames will contain the results
+        # df_run_stats, df_run_curves = ga.run()
+
+        # for rate in mutation_rates_list:
+        #     this_temp_df = df_run_curves.loc[df_run_curves['Mutation Rate'] == rate]
+        #     this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
+        #     fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
+        #     param_tuning_list.append(rate)
+        #     feval_tuning_list.append(population_sizes_list[0] * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
+        #     time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
+        #     asdf_list.append(this_temp_df['Fitness'])
+        #     fdsa_list.append(this_temp_df['Iteration'])
+        # print(time_tuning_list)
+        # plt.rc("font", size=8)
+        # plt.rc("axes", titlesize=12)
+        # plt.rc("axes", labelsize=10)
+        # plt.rc("xtick", labelsize=8)
+        # plt.rc("ytick", labelsize=8)
+        # plt.rc("legend", fontsize=8)
+        # plt.rc("figure", titlesize=11)
+        # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
+        # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
+        # fig.suptitle('GA Mutation Rate Tuning, problem_size = ' + str(problem_size))
+        # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
+        # ax[0].set(xlabel='Mutation Rate', ylabel = 'Time (s)')
+
+        # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
+        # ax[1].set(xlabel='Mutation Rate', ylabel = 'Fitness')
+
+        # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
+        # ax[2].set(xlabel='Mutation Rate', ylabel = 'Function Evaluations')
+        # ax[2].yaxis.tick_right()
+
+        # plt.show()
+
+        # fig, ax = plt.subplots()
+        # ax.scatter(fdsa_list[17], asdf_list[17])
+        # ax.set(xlabel='Iteration', ylabel = 'Fitness')
+        # plt.show()
+
+        # Tune population size
+        ga_population_tuning_fitness = []
+        ga_population_tuning_time = []
+        ga_population_tuning_feval = []
+        population_sizes_list= np.arange(10, 500, 10)
+        for population_size in population_sizes_list:
+            experiment_name = 'ga_four_peaks_tuning_population_size_' + str(problem_size)
+            mutation_rates_list=[0.15]
+            ga = runners.GARunner(problem=problem,
                         experiment_name=experiment_name,
                         output_directory='four_peaks',
                         seed=27,
                         iteration_list=[5000],
-                        max_attempts=50,
-                        restart_list=restart_list)
-            # the two data frames will contain the results
-            rhc_run_stats, rhc_run_curves = rhc.run()
-            for restart in restart_list:
-                this_temp_df = rhc_run_curves.loc[rhc_run_curves['Restarts'] == restart]
-                this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
-                rhc_fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
-                rhc_param_tuning_list.append(restart)
-                rhc_feval_tuning_list.append(3 * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
-                time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
-                asdf_list.append(this_temp_df['Fitness'])
-                fdsa_list.append(this_temp_df['Iteration'])
-            # plt.rc("font", size=8)
-            # plt.rc("axes", titlesize=12)
-            # plt.rc("axes", labelsize=10)
-            # plt.rc("xtick", labelsize=8)
-            # plt.rc("ytick", labelsize=8)
-            # plt.rc("legend", fontsize=8)
-            # plt.rc("figure", titlesize=11)
-            # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
-            # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
-            # fig.suptitle('RHC Restarts Tuning, problem_size = ' + str(problem_size))
-            # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
-            # ax[0].set(xlabel='Restarts', ylabel = 'Time')
-
-            # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
-            # ax[1].set(xlabel='Restarts', ylabel = 'Fitness')
-
-            # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
-            # ax[2].set(xlabel='Restarts', ylabel = 'Function Evaluations')
-            # ax[2].yaxis.tick_right()
-
-            # plt.show()
-
-            # fig, ax = plt.subplots()
-            # ax.scatter(fdsa_list[7], asdf_list[7])
-            # ax.set(xlabel='Iteration', ylabel = 'Fitness')
-            # plt.show()
-            # problem_size = 50
-
-        if 'sa' in optimizer_list:
-            sa_fitness_tuning_list = []
-            sa_param_tuning_list = []
-            time_tuning_list = []
-            sa_feval_tuning_list = []
-            asdf_list = []
-            fdsa_list = []
-            experiment_name = 'sa_four_peaks_tuning_size_' + str(problem_size)
-            temperature_list = np.arange(1, 50, 0.5)
-            sa = runners.SARunner(problem=problem,
-                        experiment_name=experiment_name,
-                        output_directory='four_peaks',
-                        seed=27,
-                        iteration_list=[1000],
-                        max_attempts=100,
-                        temperature_list=temperature_list)
-                        #decay_list=mlrose.GeomDecay(init_temp=1.1))
-                        #temperature_list=[1, 10, 50, 100, 250, 500, 1000, 2500, 5000, 10000])
-                        #temperature_list=[1, 10, 50, 100, 250, 500, 1000, 2500, 5000, 10000])
-            # the two data frames will contain the results
-            df_run_stats, df_run_curves = sa.run()
-            df_run_curves['Temperature'] = pd.to_numeric(df_run_curves['Temperature'].astype(str).astype(float))
-            for temp in temperature_list:
-                this_temp_df = df_run_curves.loc[df_run_curves['Temperature'] == temp]
-                this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
-                sa_fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
-                sa_param_tuning_list.append(temp)
-                sa_feval_tuning_list.append(2 * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
-                time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
-                asdf_list.append(this_temp_df['Fitness'])
-                fdsa_list.append(this_temp_df['Iteration'])
-            # plt.rc("font", size=8)
-            # plt.rc("axes", titlesize=12)
-            # plt.rc("axes", labelsize=10)
-            # plt.rc("xtick", labelsize=8)
-            # plt.rc("ytick", labelsize=8)
-            # plt.rc("legend", fontsize=8)
-            # plt.rc("figure", titlesize=11)
-            # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
-            # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
-            # fig.suptitle('SA Temperature Tuning, problem_size = ' + str(problem_size))
-            # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
-            # ax[0].set(xlabel='Temperature', ylabel = 'Time')
-
-            # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
-            # ax[1].set(xlabel='Temperature', ylabel = 'Fitness')
-
-            # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
-            # ax[2].set(xlabel='Temperature', ylabel = 'Function Evaluations')
-            # ax[2].yaxis.tick_right()
-
-            # plt.show()
-
-            # fig, ax = plt.subplots()
-            # ax.scatter(fdsa_list[17], asdf_list[17])
-            # ax.set(xlabel='Iteration', ylabel = 'Fitness')
-            # plt.show()
-
-        if 'ga' in optimizer_list:
-            # fitness_tuning_list = []
-            # param_tuning_list = []
-            # time_tuning_list = []
-            # feval_tuning_list = []
-            # asdf_list = []
-            # fdsa_list = []
-            # experiment_name = 'ga_four_peaks_tuning_size_' + str(problem_size)
-            # population_sizes_list=300,
-            # mutation_rates_list=np.arange(0.05, 1.0, 0.05)
-            # ga = runners.GARunner(problem=problem,
-            #             experiment_name=experiment_name,
-            #             output_directory='four_peaks',
-            #             seed=27,
-            #             iteration_list=[5000],
-            #             population_sizes=population_sizes_list,
-            #             mutation_rates=mutation_rates_list,
-            #             max_attempts=100)
-
-            # # the two data frames will contain the results
-            # df_run_stats, df_run_curves = ga.run()
-
-            # for rate in mutation_rates_list:
-            #     this_temp_df = df_run_curves.loc[df_run_curves['Mutation Rate'] == rate]
-            #     this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
-            #     fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
-            #     param_tuning_list.append(rate)
-            #     feval_tuning_list.append(population_sizes_list[0] * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
-            #     time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
-            #     asdf_list.append(this_temp_df['Fitness'])
-            #     fdsa_list.append(this_temp_df['Iteration'])
-            # print(time_tuning_list)
-            # plt.rc("font", size=8)
-            # plt.rc("axes", titlesize=12)
-            # plt.rc("axes", labelsize=10)
-            # plt.rc("xtick", labelsize=8)
-            # plt.rc("ytick", labelsize=8)
-            # plt.rc("legend", fontsize=8)
-            # plt.rc("figure", titlesize=11)
-            # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
-            # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
-            # fig.suptitle('GA Mutation Rate Tuning, problem_size = ' + str(problem_size))
-            # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
-            # ax[0].set(xlabel='Mutation Rate', ylabel = 'Time (s)')
-
-            # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
-            # ax[1].set(xlabel='Mutation Rate', ylabel = 'Fitness')
-
-            # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
-            # ax[2].set(xlabel='Mutation Rate', ylabel = 'Function Evaluations')
-            # ax[2].yaxis.tick_right()
-
-            # plt.show()
-
-            # fig, ax = plt.subplots()
-            # ax.scatter(fdsa_list[17], asdf_list[17])
-            # ax.set(xlabel='Iteration', ylabel = 'Fitness')
-            # plt.show()
-
-            # Tune population size
-            ga_population_tuning_fitness = []
-            ga_population_tuning_time = []
-            ga_population_tuning_feval = []
-            population_sizes_list= np.arange(10, 500, 10)
-            for population_size in population_sizes_list:
-                experiment_name = 'ga_four_peaks_tuning_population_size_' + str(problem_size)
-                mutation_rates_list=[0.15]
-                ga = runners.GARunner(problem=problem,
-                            experiment_name=experiment_name,
-                            output_directory='four_peaks',
-                            seed=27,
-                            iteration_list=[5000],
-                            population_sizes=[int(population_size)],
-                            mutation_rates=mutation_rates_list,
-                            max_attempts=50)
-
-                # the two data frames will contain the results
-                ga_run_stats, ga_run_curves = ga.run()
-                ga_population_tuning_fitness.append(ga_run_curves.loc[ga_run_curves['Fitness'].idxmax()]['Fitness'])
-                ga_population_tuning_time.append(ga_run_curves.loc[ga_run_curves['Time'].idxmax()]['Time'])
-                ga_population_tuning_feval.append(population_size * ga_run_curves.loc[ga_run_curves['Iteration'].idxmax()]['Iteration'])
-
-            # plt.rc("font", size=8)
-            # plt.rc("axes", titlesize=12)
-            # plt.rc("axes", labelsize=10)
-            # plt.rc("xtick", labelsize=8)
-            # plt.rc("ytick", labelsize=8)
-            # plt.rc("legend", fontsize=8)
-            # plt.rc("figure", titlesize=11)
-            # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
-            # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
-            # fig.suptitle('GA Population Size Tuning, problem_size = ' + str(problem_size))
-            # ax[0].scatter(population_sizes_list, ga_population_tuning_time, c='r', marker='x', s=10)
-            # ax[0].set(xlabel='Population Size', ylabel = 'Time')
-
-            # ax[1].scatter(population_sizes_list, ga_population_tuning_fitness, c='g', marker='x', s=10)
-            # ax[1].set(xlabel='Population Size', ylabel = 'Fitness')
-
-            # ax[2].scatter(param_tuning_list, ga_population_tuning_feval, c='g', marker='o', s=10)
-            # ax[2].set(xlabel='Population Size', ylabel = 'Function Evaluations')
-            # ax[2].yaxis.tick_right()
-
-            # plt.show()
-
-        if 'mimic' in optimizer_list:
-            # fitness_tuning_list = []
-            # param_tuning_list = []
-            # time_tuning_list = []
-            # feval_tuning_list - []
-            # asdf_list = []
-            # fdsa_list = []
-            # experiment_name = 'mimic_four_peaks_tuning_size_' + str(problem_size)
-            # population_sizes_list=280,
-            # keep_percent_list=np.arange(0.05, 1.0, 0.05)
-            # mimic = runners.MIMICRunner(problem=problem,
-            #             experiment_name=experiment_name,
-            #             output_directory='four_peaks',
-            #             seed=27,
-            #             iteration_list=[100],
-            #             population_sizes=population_sizes_list,
-            #             keep_percent_list=keep_percent_list,
-            #             max_attempts=10)
-
-            # # the two data frames will contain the results
-            # df_run_stats, df_run_curves = mimic.run()
-            # # print(df_run_curves.dtypes)
-            # # print(df_run_curves)
-            # # #df_run_curves['Temperature'] = pd.to_numeric(df_run_curves['Temperature'].astype(str).astype(float))
-            # # print(df_run_curves)
-            # for percent in keep_percent_list:
-            #     this_temp_df = df_run_curves.loc[df_run_curves['Keep Percent'] == percent]
-            #     this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
-            #     fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
-            #     param_tuning_list.append(percent)
-            #     feval_tuning_list.append(population_sizes_list[0] * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
-            #     time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
-            #     asdf_list.append(this_temp_df['Fitness'])
-            #     fdsa_list.append(this_temp_df['Iteration'])
-
-            # plt.rc("font", size=8)
-            # plt.rc("axes", titlesize=12)
-            # plt.rc("axes", labelsize=10)
-            # plt.rc("xtick", labelsize=8)
-            # plt.rc("ytick", labelsize=8)
-            # plt.rc("legend", fontsize=8)
-            # plt.rc("figure", titlesize=11)
-            # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
-            # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
-            # fig.suptitle('MIMIC Keep Percent Tuning, problem_size = ' + str(problem_size))
-            # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
-            # ax[0].set(xlabel='Keep Percent (decimal)', ylabel = 'Time (s)')
-
-            # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
-            # ax[1].set(xlabel='Keep Percent (decimal)', ylabel = 'Fitness')
-
-            # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
-            # ax[2].set(xlabel='Keep Percent (decimal)', ylabel = 'Function Evaluations')
-            # ax[2].yaxis.tick_right()
-
-            # plt.show()
-
-            # fig, ax = plt.subplots()
-            # ax.scatter(fdsa_list[17], asdf_list[17])
-            # ax.set(xlabel='Iteration', ylabel = 'Fitness')
-            # plt.show()
-
-            # Tune population size
-            mimic_population_tuning_fitness = []
-            mimic_population_tuning_time = []
-            mimic_population_tuning_feval = []
-            population_sizes_list= np.arange(10, 500, 10)
-            for population_size in population_sizes_list:
-                experiment_name = 'mimic_four_peaks_tuning_population_size_' + str(problem_size)
-                keep_percent_list=[0.25]
-                mimic = runners.MIMICRunner(problem=problem,
-                        experiment_name=experiment_name,
-                        output_directory='four_peaks',
-                        seed=27,
-                        iteration_list=[100],
                         population_sizes=[int(population_size)],
-                        keep_percent_list=keep_percent_list,
-                        max_attempts=5,
-                        use_fast_mimic=True)
+                        mutation_rates=mutation_rates_list,
+                        max_attempts=50)
 
-                # the two data frames will contain the results
-                mimic_run_stats, mimic_run_curves = mimic.run()
-                mimic_population_tuning_fitness.append(mimic_run_curves.loc[mimic_run_curves['Fitness'].idxmax()]['Fitness'])
-                mimic_population_tuning_time.append(mimic_run_curves.loc[mimic_run_curves['Time'].idxmax()]['Time'])
-                mimic_population_tuning_feval.append(population_size * mimic_run_curves.loc[mimic_run_curves['Iteration'].idxmax()]['Iteration'])
+            # the two data frames will contain the results
+            ga_run_stats, ga_run_curves = ga.run()
+            ga_population_tuning_fitness.append(ga_run_curves.loc[ga_run_curves['Fitness'].idxmax()]['Fitness'])
+            ga_population_tuning_time.append(ga_run_curves.loc[ga_run_curves['Time'].idxmax()]['Time'])
+            ga_population_tuning_feval.append(population_size * ga_run_curves.loc[ga_run_curves['Iteration'].idxmax()]['Iteration'])
 
-            plt.rc("font", size=8)
-            plt.rc("axes", titlesize=14)
-            plt.rc("axes", labelsize=10)
-            plt.rc("xtick", labelsize=8)
-            plt.rc("ytick", labelsize=8)
-            plt.rc("legend", fontsize=11)
-            plt.rc("figure", titlesize=11)
-            fig, ax = plt.subplots(2, 4, figsize=(12, 7))
-            fig.suptitle('Four Peaks Algorithm Tuning, problem size = ' + str(problem_size))
+        # plt.rc("font", size=8)
+        # plt.rc("axes", titlesize=12)
+        # plt.rc("axes", labelsize=10)
+        # plt.rc("xtick", labelsize=8)
+        # plt.rc("ytick", labelsize=8)
+        # plt.rc("legend", fontsize=8)
+        # plt.rc("figure", titlesize=11)
+        # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
+        # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
+        # fig.suptitle('GA Population Size Tuning, problem_size = ' + str(problem_size))
+        # ax[0].scatter(population_sizes_list, ga_population_tuning_time, c='r', marker='x', s=10)
+        # ax[0].set(xlabel='Population Size', ylabel = 'Time')
 
-            ax[0, 0].scatter(rhc_param_tuning_list, rhc_fitness_tuning_list, c='r', marker='x', s=10)
-            ax[0, 0].set(xlabel='Restarts', ylabel = 'Fitness', title='RHC Restarts')
+        # ax[1].scatter(population_sizes_list, ga_population_tuning_fitness, c='g', marker='x', s=10)
+        # ax[1].set(xlabel='Population Size', ylabel = 'Fitness')
 
-            ax[0, 1].scatter(sa_param_tuning_list, sa_fitness_tuning_list, c='g', marker='o', s=10)
-            ax[0, 1].set(xlabel='Temperature', title='SA Temperature')
+        # ax[2].scatter(param_tuning_list, ga_population_tuning_feval, c='g', marker='o', s=10)
+        # ax[2].set(xlabel='Population Size', ylabel = 'Function Evaluations')
+        # ax[2].yaxis.tick_right()
 
-            ax[0, 2].scatter(population_sizes_list, ga_population_tuning_fitness, c='g', marker='o', s=10)
-            ax[0, 2].set(xlabel='Population Size', title='GA Population Size')
-            ax[0, 2].yaxis.tick_right()
+        # plt.show()
 
-            ax[0, 3].scatter(population_sizes_list, mimic_population_tuning_fitness, c='g', marker='o', s=10)
-            ax[0, 3].set(xlabel='Population Size', title='MIMIC Population Size')
-            ax[0, 3].yaxis.tick_right()
+        # fitness_tuning_list = []
+        # param_tuning_list = []
+        # time_tuning_list = []
+        # feval_tuning_list - []
+        # asdf_list = []
+        # fdsa_list = []
+        # experiment_name = 'mimic_four_peaks_tuning_size_' + str(problem_size)
+        # population_sizes_list=280,
+        # keep_percent_list=np.arange(0.05, 1.0, 0.05)
+        # mimic = runners.MIMICRunner(problem=problem,
+        #             experiment_name=experiment_name,
+        #             output_directory='four_peaks',
+        #             seed=27,
+        #             iteration_list=[100],
+        #             population_sizes=population_sizes_list,
+        #             keep_percent_list=keep_percent_list,
+        #             max_attempts=10)
 
-            ax[1, 0].scatter(rhc_param_tuning_list, rhc_feval_tuning_list, c='r', marker='x', s=10)
-            ax[1, 0].set(xlabel='Restarts', ylabel = 'Function Evaluations')
+        # # the two data frames will contain the results
+        # df_run_stats, df_run_curves = mimic.run()
+        # # print(df_run_curves.dtypes)
+        # # print(df_run_curves)
+        # # #df_run_curves['Temperature'] = pd.to_numeric(df_run_curves['Temperature'].astype(str).astype(float))
+        # # print(df_run_curves)
+        # for percent in keep_percent_list:
+        #     this_temp_df = df_run_curves.loc[df_run_curves['Keep Percent'] == percent]
+        #     this_temp_df['Iteration'] = this_temp_df['Iteration'] - this_temp_df.loc[this_temp_df['Iteration'].idxmin()]['Iteration'] + 1
+        #     fitness_tuning_list.append(this_temp_df.loc[this_temp_df['Fitness'].idxmax()]['Fitness'])
+        #     param_tuning_list.append(percent)
+        #     feval_tuning_list.append(population_sizes_list[0] * this_temp_df.loc[this_temp_df['Iteration'].idxmax()]['Iteration'])
+        #     time_tuning_list.append(this_temp_df.loc[this_temp_df['Time'].idxmax()]['Time'])
+        #     asdf_list.append(this_temp_df['Fitness'])
+        #     fdsa_list.append(this_temp_df['Iteration'])
 
-            ax[1, 1].scatter(sa_param_tuning_list, sa_feval_tuning_list, c='g', marker='o', s=10)
-            ax[1, 1].set(xlabel='Temperature')
+        # plt.rc("font", size=8)
+        # plt.rc("axes", titlesize=12)
+        # plt.rc("axes", labelsize=10)
+        # plt.rc("xtick", labelsize=8)
+        # plt.rc("ytick", labelsize=8)
+        # plt.rc("legend", fontsize=8)
+        # plt.rc("figure", titlesize=11)
+        # #fig, ax = plt.subplots(2, 1, dpi=100, sharex=True, figsize=(5,4))
+        # fig, ax = plt.subplots(1,3,figsize=(12,3.5))
+        # fig.suptitle('MIMIC Keep Percent Tuning, problem_size = ' + str(problem_size))
+        # ax[0].scatter(param_tuning_list, time_tuning_list, c='r', marker='x', s=10)
+        # ax[0].set(xlabel='Keep Percent (decimal)', ylabel = 'Time (s)')
 
-            ax[1, 2].scatter(population_sizes_list, ga_population_tuning_feval, c='g', marker='o', s=10)
-            ax[1, 2].set(xlabel='Population Size')
-            ax[1, 2].yaxis.tick_right()
+        # ax[1].scatter(param_tuning_list, fitness_tuning_list, c='g', marker='o', s=10)
+        # ax[1].set(xlabel='Keep Percent (decimal)', ylabel = 'Fitness')
 
-            ax[1, 3].scatter(population_sizes_list, mimic_population_tuning_feval, c='g', marker='o', s=10)
-            ax[1, 3].set(xlabel='Population Size')
-            ax[1, 3].yaxis.tick_right()
+        # ax[2].scatter(param_tuning_list, feval_tuning_list, c='g', marker='o', s=10)
+        # ax[2].set(xlabel='Keep Percent (decimal)', ylabel = 'Function Evaluations')
+        # ax[2].yaxis.tick_right()
 
-            plt.show()
+        # plt.show()
+
+        # fig, ax = plt.subplots()
+        # ax.scatter(fdsa_list[17], asdf_list[17])
+        # ax.set(xlabel='Iteration', ylabel = 'Fitness')
+        # plt.show()
+
+        # Tune population size
+        mimic_population_tuning_fitness = []
+        mimic_population_tuning_time = []
+        mimic_population_tuning_feval = []
+        population_sizes_list= np.arange(10, 500, 10)
+        for population_size in population_sizes_list:
+            experiment_name = 'mimic_four_peaks_tuning_population_size_' + str(problem_size)
+            keep_percent_list=[0.25]
+            mimic = runners.MIMICRunner(problem=problem,
+                    experiment_name=experiment_name,
+                    output_directory='four_peaks',
+                    seed=27,
+                    iteration_list=[100],
+                    population_sizes=[int(population_size)],
+                    keep_percent_list=keep_percent_list,
+                    max_attempts=5,
+                    use_fast_mimic=True)
+
+            # the two data frames will contain the results
+            mimic_run_stats, mimic_run_curves = mimic.run()
+            mimic_population_tuning_fitness.append(mimic_run_curves.loc[mimic_run_curves['Fitness'].idxmax()]['Fitness'])
+            mimic_population_tuning_time.append(mimic_run_curves.loc[mimic_run_curves['Time'].idxmax()]['Time'])
+            mimic_population_tuning_feval.append(population_size * mimic_run_curves.loc[mimic_run_curves['Iteration'].idxmax()]['Iteration'])
+
+        plt.rc("font", size=8)
+        plt.rc("axes", titlesize=14)
+        plt.rc("axes", labelsize=10)
+        plt.rc("xtick", labelsize=8)
+        plt.rc("ytick", labelsize=8)
+        plt.rc("legend", fontsize=11)
+        plt.rc("figure", titlesize=11)
+        fig, ax = plt.subplots(2, 4, figsize=(12, 7))
+        fig.suptitle('Four Peaks Algorithm Tuning, problem size = ' + str(problem_size))
+
+        ax[0, 0].scatter(rhc_param_tuning_list, rhc_fitness_tuning_list, c='r', marker='x', s=10)
+        ax[0, 0].set(xlabel='Restarts', ylabel = 'Fitness', title='RHC Restarts')
+
+        ax[0, 1].scatter(sa_param_tuning_list, sa_fitness_tuning_list, c='g', marker='o', s=10)
+        ax[0, 1].set(xlabel='Temperature', title='SA Temperature')
+
+        ax[0, 2].scatter(population_sizes_list, ga_population_tuning_fitness, c='g', marker='o', s=10)
+        ax[0, 2].set(xlabel='Population Size', title='GA Population Size')
+        ax[0, 2].yaxis.tick_right()
+
+        ax[0, 3].scatter(population_sizes_list, mimic_population_tuning_fitness, c='g', marker='o', s=10)
+        ax[0, 3].set(xlabel='Population Size', title='MIMIC Population Size')
+        ax[0, 3].yaxis.tick_right()
+
+        ax[1, 0].scatter(rhc_param_tuning_list, rhc_feval_tuning_list, c='r', marker='x', s=10)
+        ax[1, 0].set(xlabel='Restarts', ylabel = 'Function Evaluations')
+
+        ax[1, 1].scatter(sa_param_tuning_list, sa_feval_tuning_list, c='g', marker='o', s=10)
+        ax[1, 1].set(xlabel='Temperature')
+
+        ax[1, 2].scatter(population_sizes_list, ga_population_tuning_feval, c='g', marker='o', s=10)
+        ax[1, 2].set(xlabel='Population Size')
+        ax[1, 2].yaxis.tick_right()
+
+        ax[1, 3].scatter(population_sizes_list, mimic_population_tuning_feval, c='g', marker='o', s=10)
+        ax[1, 3].set(xlabel='Population Size')
+        ax[1, 3].yaxis.tick_right()
+
+        plt.show()
 
     if 'complexity_graph' in task:
         problem_size_list = np.arange(5, 85, 5)

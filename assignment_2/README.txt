@@ -24,41 +24,36 @@ git clone https://github.com/hiive/mlrose.git
 cd mlrose
 git checkout 2.1.7
 pip install -e .
+cd ..
 
 4. Enter the optimization directory
 cd optimization/
 
 5. Perform the desired task using the instructions below.
 
-optimization -t <task_option> -o <optimizer> -p <problem>
-
-NOTE: You must pass in all optimizers for all tasks, otherwise plots won't generate correctly
+optimization -t <task_option> -p <problem>
 
 Task options...
 
 tune_problem = Generate tuning plots for tuning optimization problem listed in <problem> arg
-tuning_plots = Generate tuning plots for tuning optimization algorithms listed in the <optimizer> arg for a problem listed in <problem> arg
+tuning_plots = Generate tuning plots for tuning optimization algorithms for a problem listed in <problem> arg
 complexity_graph = Generate complexity analysis for problem listed in <problem> arg
 performance_graph = Generate performance analysis for problem listed in <problem> arg
 
-Optimizer options....
-rhc = Random Hill Climb
-sa = Simulated Annealing
-ga = Genetic Algorithm
-mimic = MIMIC
 
 Problem options....
-knapsack = knapsack
+
+knapsack = Knapsack
 four_peaks = Four Peaks
 k_colors = Max K-Colors
+neural_network = Neural Network weight optimization
 
+NOTE: Neural network problem only has task options tuning_plots and performance_graph
 
 Here is an example of generating the tuning plots for all algorithms for the four peaks problem
 
-optimization -t tuning_plots -o rhc sa ga mimic -p four_peaks
+optimization -t tuning_plots -p four_peaks
 
 Here is an example of generating the complexity analysis plot for the Max K-Colors problem
 
-optimization -t complexity_graph -p rhc sa ga mimic -p k_colors
-
-NOTE: You must pass in all optimizers for all tasks, otherwise plots won't generate correctly
+optimization -t complexity_graph -p k_colors
