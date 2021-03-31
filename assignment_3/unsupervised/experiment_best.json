@@ -1,0 +1,60 @@
+{
+    "pca": {
+        "smart": 11,
+        "bank": 10,
+        "k_means": {
+            "smart": 2,
+            "bank": 3
+        },
+        "em": {
+            "smart": 3,
+            "bank": 4
+        }
+    },
+    "ica": {
+        "smart": 11,
+        "bank": 4,
+        "k_means": {
+            "smart": 3,
+            "bank": 5
+        },
+        "em": {
+            "smart": 3,
+            "bank": 6
+        }
+    },
+    "rp": {
+        "smart": 11,
+        "bank": 12,
+        "smart_seed": 87,
+        "bank_seed": 37,
+        "k_means": {
+            "smart": 2,
+            "bank": 2
+        },
+        "em": {
+            "smart": 3,
+            "bank": 6
+        }
+    },
+    "fa": {
+        "smart": 6,
+        "bank": 7,
+        "k_means": {
+            "smart": 6,
+            "bank": 5
+        },
+        "em": {
+            "smart": 5,
+            "bank": 6
+        }
+    },
+    "k_means": {
+        "smart": 2,
+        "bank": 3
+    },
+    "em": {
+        "smart": 3,
+        "bank": 6
+    }
+}

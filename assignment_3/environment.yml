@@ -1,0 +1,8 @@
+name: machine-learning
+dependencies:
+- python=3.8
+- scikit-learn
+- pandas
+- numpy
+- matplotlib
+- ipython
