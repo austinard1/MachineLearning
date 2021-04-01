@@ -355,7 +355,7 @@ def main(X_train_smart, X_test_smart, y_train_smart, y_test_smart, X_train_bank,
         with open('experiment_best.json') as f:
             params = json.load(f)
 
-        num_features_reduced = 6
+        num_features_reduced = 5
         # Baseline (same as A1)
         base_nn = MLPClassifier(hidden_layer_sizes=[30, 30], max_iter = 100, random_state=27)
         base_fit_t = time()

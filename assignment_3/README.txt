@@ -1,9 +1,9 @@
 Code Location
-https://github.com/austinard1/MachineLearning/tree/master/assignment_2
+https://github.com/austinard1/MachineLearning/tree/master/assignment_3
 
 0. Clone the above repository...
 git clone https://github.com/austinard1/MachineLearning.git
-cd MachineLearning/assignment_2/
+cd MachineLearning/assignment_3/
 git checkout master
 
 1. Create conda environment
@@ -27,29 +27,45 @@ cd unsupervised/
 
 6. Perform the desired task using the instructions below.
 
-optimization -t <task_option> -p <problem>
+unsupervised -c <clustering option> -dr <dimensionality reduction option> -nn (flag to perform NN analysis)
 
-Task options...
+Clustering options...
 
-tune_problem = Generate tuning plots for tuning optimization problem listed in <problem> arg
-tuning_plots = Generate tuning plots for tuning optimization algorithms for a problem listed in <problem> arg
-complexity_graph = Generate complexity analysis for problem listed in <problem> arg
-performance_graph = Generate performance analysis for problem listed in <problem> arg
+k_means = Generate plots/results for K-Means clustering
+em = Generate plots/results for EM clustering
 
 
-Problem options....
+Dimensionality Reduction options...
 
-knapsack = Knapsack
-four_peaks = Four Peaks
-k_colors = Max K-Colors
-neural_network = Neural Network weight optimization
+pca = Generate plots/results for Principal Component Analysis
+ica = Generate plots/results for Independent Component Analysis
+rp = Generate plots/results for Random Projection
+fa = Generate plots/results for Factor Analysis
 
-NOTE: Neural network problem only has task options tuning_plots and performance_graph
+NOTE: Combining both a clustering and DR option will show results for the combination (see examples below)
 
-Here is an example of generating the tuning plots for all algorithms for the four peaks problem
+Neural Network flag...
 
-optimization -t tuning_plots -p four_peaks
+The -nn flag will generate neural network results for all algorithms in the class of the other input argument (either cluster or DR)
+This means that for clustering neural network results, any clustering option can be passed in alongside the -nn flag (see examples below)
 
-Here is an example of generating the complexity analysis plot for the Max K-Colors problem
 
-optimization -t complexity_graph -p k_colors
+Here is an example of generating the results for just K-means
+
+unsupervised -c k_means
+
+Here is an example of generating the results for just Random Projection
+
+unsupervised -dr rp
+
+Here is an example of generating the combination results for ICA followed by EM
+
+unsupervised -dr ica -c em
+
+Here is an example of generating the neural network results for all dimensionality reduction algorithms
+
+unsupervised -dr pca -nn
+
+Here is an example of generating the neural network results for all clustering algorithms
+
+unsupervised -c em -nn
