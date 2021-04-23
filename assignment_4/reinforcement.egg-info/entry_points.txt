@@ -1,0 +1,3 @@
+[console_scripts]
+reinforcement = reinforcement.reinforcement:main
+

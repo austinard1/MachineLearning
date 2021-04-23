@@ -1,0 +1,9 @@
+Metadata-Version: 1.2
+Name: reinforcement
+Version: 0.0.0
+Summary: MDP and Reinforcement learning
+Home-page: UNKNOWN
+License: UNKNOWN
+Description: UNKNOWN
+Platform: UNKNOWN
+Requires-Python: >=3.7, <4

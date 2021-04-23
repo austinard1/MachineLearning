@@ -1,0 +1,8 @@
+README.txt
+setup.py
+reinforcement.egg-info/PKG-INFO
+reinforcement.egg-info/SOURCES.txt
+reinforcement.egg-info/dependency_links.txt
+reinforcement.egg-info/entry_points.txt
+reinforcement.egg-info/requires.txt
+reinforcement.egg-info/top_level.txt
